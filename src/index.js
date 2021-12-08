@@ -19,6 +19,7 @@ function getDataInput(e) {
     return;
   }
   if (searchValue.length < 3) {
+    countryInfo.innerHTML = '';
     Notify.info('Too many matches found. Please enter a more specific name.');
     fetchCountries(searchValue)
       .then(data => {
@@ -41,14 +42,20 @@ function getDataInput(e) {
     .then(data => {
       const countries = data;
       const countryListItems = countries.map(country => {
-        return `<p class ="info">
-              <span class="country-flag"><img width = "100px" src="${
+        return `<p class ="card-info">
+              <p class="country-flag"><img width = "100px" src="${
                 country.flags.svg
-              }" alt="country flag"></span>
-              <span class="country-name">${country.name.official}</span>
-              <span class="country-capital">${country.capital}</span>
-              <span class="country-population">${country.population}</span>
-              <span class="country-languages">${Object.values(country.languages)}</span>
+              }" alt="country flag"></p>
+              <p class="country-name">${country.name.official}</p>
+              <p class="country-capital"><span class = "item_mod">Capital:</span> ${
+                country.capital
+              }</p>
+              <p class="country-population"><span class = "item_mod">Population:</span> ${
+                country.population
+              }</p>
+              <p class="country-languages"><span class = "item_mod">Languages:</span> ${Object.values(
+                country.languages,
+              )}</p>
           </p>`;
       });
       countryInfo.innerHTML = countryListItems.join('');
