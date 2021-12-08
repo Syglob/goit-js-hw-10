@@ -9,7 +9,7 @@ const DEBOUNCE_DELAY = 300;
 const searchInput = document.getElementById('search-box');
 const countryList = document.querySelector('.country-list');
 const countryInfo = document.querySelector('.country-info');
-
+// import fetchCountries from '/fetchCountries';
 function fetchCountries(nameCountry) {
   return fetch(
     `https://restcountries.com/v3.1/name/${nameCountry}?fields=name,capital,population,flags,languages`,
@@ -27,7 +27,8 @@ function fetchCountries(nameCountry) {
       return countries;
     })
     .catch(err => {
-      Notify.failure('Страна не найдена');
+      Notify.failure('Страны не найдены');
+      console.log('fetching err', err);
     });
 }
 
@@ -36,7 +37,13 @@ searchInput.addEventListener('input', debounce(getDataInput, DEBOUNCE_DELAY));
 function getDataInput(e) {
   const searchValue = e.target.value;
   if (searchValue.length < 3) {
-    Notify.failure('Введите название страны');
+    Notify.info('Too many matches found. Please enter a more specific name.');
+    return;
+  }
+  if (searchValue.length === 0) {
+    countryList.innerHTML = '';
+    Notify.info('Введите название страны');
+    return;
   }
   fetchCountries(searchValue)
     .then(data => {
@@ -46,8 +53,10 @@ function getDataInput(e) {
               <span class="country-name">${country.name.official}</span>
               <span class="country-capital">${country.capital}</span>
               <span class="country-population">${country.population}</span>
-              <span class="country-languages">${country.languages}</span>
-              <span class="country-flag"><img width = "100px" src="${country.flags.svg}" alt="country flag"></span>
+              <span class="country-languages">${Object.values(country.languages)}</span>
+              <span class="country-flag"><img width = "100px" src="${
+                country.flags.svg
+              }" alt="country flag"></span>
           </li>`;
       });
       countryList.innerHTML = countryListItems.join('');
