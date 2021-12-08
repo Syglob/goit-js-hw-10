@@ -1,8 +1,6 @@
 import './css/styles.css';
 import Notiflix, { Notify } from 'notiflix';
 import debounce from 'lodash.debounce';
-// import { debounce } from 'throttle-debounce';
-// import { functions } from 'lodash';
 
 const DEBOUNCE_DELAY = 300;
 
@@ -18,7 +16,7 @@ function fetchCountries(nameCountry) {
       if (!res.ok) {
         throw new Error('Error fetching countries');
       }
-      Notify.success('Страны найдены');
+      // Notify.success('Страны найдены');
       return res.json();
     })
     .then(data => {
@@ -36,34 +34,48 @@ searchInput.addEventListener('input', debounce(getDataInput, DEBOUNCE_DELAY));
 
 function getDataInput(e) {
   const searchValue = e.target.value;
-  if (searchValue.length < 3) {
-    Notify.info('Too many matches found. Please enter a more specific name.');
-    return;
-  }
   if (searchValue.length === 0) {
     countryList.innerHTML = '';
-    Notify.info('Введите название страны');
+    countryInfo.innerHTML = '';
+    // Notify.info('Введите название страны');
+    return;
+  }
+  if (searchValue.length < 3) {
+    Notify.info('Too many matches found. Please enter a more specific name.');
+    fetchCountries(searchValue)
+      .then(data => {
+        const countries = data;
+        const countryListItems = countries.map(country => {
+          return `<p class ="info">
+              <span class="country-flag"><img width = "100px" src="${country.flags.svg}" alt="country flag"></span>
+              <span class="country-name">${country.name.official}</span>
+          </p>`;
+        });
+        countryInfo.innerHTML = countryListItems.join('');
+      })
+      .catch(err => {
+        console.log('beda', err);
+      });
     return;
   }
   fetchCountries(searchValue)
     .then(data => {
       const countries = data;
       const countryListItems = countries.map(country => {
-        return `<li>
+        return `<p class ="info">
+              <span class="country-flag"><img width = "100px" src="${
+                country.flags.svg
+              }" alt="country flag"></span>
               <span class="country-name">${country.name.official}</span>
               <span class="country-capital">${country.capital}</span>
               <span class="country-population">${country.population}</span>
               <span class="country-languages">${Object.values(country.languages)}</span>
-              <span class="country-flag"><img width = "100px" src="${
-                country.flags.svg
-              }" alt="country flag"></span>
-          </li>`;
+          </p>`;
       });
-      countryList.innerHTML = countryListItems.join('');
+      countryInfo.innerHTML = countryListItems.join('');
     })
     .catch(err => {
       console.log('beda', err);
     });
   console.log(searchValue);
-  // fetchCountries(searchValue);
 }

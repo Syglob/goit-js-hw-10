@@ -22,3 +22,7 @@ body {
 ul {
   list-style: none;
 }
+.info {
+  display: flex;
+  flex-direction: column;
+}
